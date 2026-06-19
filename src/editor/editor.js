@@ -1,4 +1,5 @@
 import * as monaco from 'monaco-editor';
+import 'monaco-editor/min/vs/editor/editor.main.css';
 
 // Configure Monaco Editor Workers for Vite
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
