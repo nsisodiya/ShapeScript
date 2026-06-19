@@ -7,12 +7,12 @@ ShapeScript is a 100% client-side, offline-first CAD modeling environment that l
 ### 1. ShapeScript CAD Editor
 Below is the web interface of ShapeScript featuring the Monaco code editor on the left, live parametric sliders, and the Three.js viewport on the right rendering the 3D model:
 
-![ShapeScript CAD Editor Interface](a.png)
+![ShapeScript CAD Editor Interface](1.png)
 
 ### 2. Exported Model inside Bambu Studio
 Below is the binary STL exported from ShapeScript imported on the build plate of Bambu Studio, showing the exact teeth geometries ready to slice and print:
 
-![Imported STL in Bambu Studio](b.png)
+![Imported STL in Bambu Studio](2.png)
 
 ---
 
