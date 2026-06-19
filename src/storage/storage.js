@@ -5,20 +5,38 @@ const FILE_CODE_PREFIX = 'shapescript_file_code_';
 const DEFAULT_WELCOME_CODE = `// Welcome to ShapeScript!
 // Write pure JavaScript to generate 3D models for 3D printing.
 
-const width = slider("Width", 40, 20, 80);
-const depth = slider("Depth", 40, 20, 80);
-const height = slider("Height", 30, 10, 60);
-const holeRadius = slider("Hole Radius", 12, 5, 25);
-const showHole = checkbox("Cut Hole", true);
+const teeth = slider("Teeth Count", 12, 6, 24);
+const thickness = slider("Gear Thickness", 8, 4, 25);
+const centerHole = checkbox("Axle Center Hole", true);
 
-const outer = box(width, depth, height);
-const cyl = cylinder(holeRadius, height + 10).move(width / 2, depth / 2, -5);
+const innerRadius = 24;
+const outerRadius = 28;
+const toothWidth = 6;
 
-if (showHole) {
-  return subtract(outer, cyl);
-} else {
-  return outer;
+// Central Gear Core
+const core = cylinder(innerRadius, thickness);
+
+let gear = core;
+
+// Add teeth radially
+for (let i = 0; i < teeth; i++) {
+  const angle = (i * 360) / teeth;
+  
+  // Single tooth box shifted outward along Y and rotated
+  const tooth = box(toothWidth, 12, thickness)
+    .move(-toothWidth / 2, innerRadius - 4, 0)
+    .rotate(0, 0, angle);
+    
+  gear = union(gear, tooth);
 }
+
+// Axle Hole Cut
+if (centerHole) {
+  const hole = cylinder(4.5, thickness + 4).move(0, 0, -2);
+  return subtract(gear, hole);
+}
+
+return gear;
 `;
 
 export const StorageManager = {

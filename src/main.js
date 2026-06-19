@@ -166,25 +166,6 @@ function bindEvents() {
     viewer.resetCamera();
   };
 
-  // Tutorial Dialog Actions
-  const btnTutorial = document.getElementById('btn-tutorial');
-  const tutorialDialog = document.getElementById('tutorial-dialog');
-  const btnCloseTutorial = document.getElementById('btn-close-tutorial');
-
-  if (btnTutorial && tutorialDialog && btnCloseTutorial) {
-    btnTutorial.onclick = () => {
-      tutorialDialog.showModal();
-    };
-    btnCloseTutorial.onclick = () => {
-      tutorialDialog.close();
-    };
-    // Close modal if user clicks outside the modal box (on backdrop overlay)
-    tutorialDialog.onclick = (e) => {
-      if (e.target === tutorialDialog) {
-        tutorialDialog.close();
-      }
-    };
-  }
 
   // STL Download
   btnDownloadStl.onclick = () => {
