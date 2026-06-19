@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShapeScript Tutorial - Learn 3D Coding</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/index.css">
+  <style>
+    body {
+      overflow-y: auto;
+      background-color: var(--color-bg-base);
+      color: var(--color-text-primary);
+      padding: 40px 20px;
+    }
+    .tutorial-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .tutorial-header {
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: 24px;
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .tutorial-header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #38bdf8, #0369a1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .back-link {
+      text-decoration: none;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+      transition: color 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .back-link:hover {
+      color: var(--color-accent-hover);
+    }
+    h2 {
+      color: #38bdf8;
+      font-size: 1.4rem;
+      margin-top: 40px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(56, 189, 248, 0.15);
+      padding-bottom: 6px;
+    }
+    h3 {
+      font-size: 1.1rem;
+      margin-top: 24px;
+      margin-bottom: 8px;
+      color: var(--color-text-primary);
+    }
+    p {
+      color: var(--color-text-secondary);
+      margin-bottom: 16px;
+      line-height: 1.6;
+      font-size: 0.95rem;
+    }
+    code {
+      background-color: #1e1e1e;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: #38bdf8;
+      border: 1px solid var(--color-border);
+    }
+    pre {
+      background-color: #1a1a1a;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 16px;
+      margin: 12px 0 24px 0;
+      overflow-x: auto;
+    }
+    pre code {
+      background-color: transparent;
+      padding: 0;
+      color: #e2e8f0;
+      font-size: 0.85rem;
+      border: none;
+    }
+    ul, ol {
+      margin-left: 20px;
+      margin-bottom: 16px;
+      color: var(--color-text-secondary);
+    }
+    li {
+      margin-bottom: 8px;
+      line-height: 1.5;
+    }
+    .highlight-box {
+      background-color: rgba(0, 122, 204, 0.08);
+      border-left: 4px solid var(--color-accent);
+      padding: 16px;
+      border-radius: 0 8px 8px 0;
+      margin: 20px 0;
+    }
+    .highlight-box p {
+      margin-bottom: 0;
+      color: var(--color-text-primary);
+    }
+  </style>
+</head>
+<body>
+  <div class="tutorial-container">
+    <header class="tutorial-header">
+      <div>
+        <h1>ShapeScript Tutorial</h1>
+        <p style="margin: 4px 0 0 0; color: var(--color-text-muted);">Learn to generate 3D models with code</p>
+      </div>
+      <a href="/" class="back-link">
+        ← Back to Editor
+      </a>
+    </header>
+
+    <main>
+      <h2>1. The Core Philosophy</h2>
+      <p>ShapeScript is a lightweight browser modeling tool. Instead of clicking and dragging shapes, you write standard JavaScript code. Every script must <strong>return</strong> the final 3D model that you want to render and export to STL.</p>
+      <div class="highlight-box">
+        <p><strong>Note:</strong> The default unit of measurement is <strong>millimeters (mm)</strong>, standard for 3D slicers.</p>
+      </div>
+
+      <h2>2. 3D Primitives</h2>
+      <p>Create basic solids using the following global functions:</p>
+      
+      <h3>Cubes and Boxes</h3>
+      <p><code>cube(size)</code> creates a symmetric cube. <code>box(width, depth, height)</code> creates a cuboid. They are anchored in the positive octant, stretching from <code>0</code> to the defined dimension on all axes.</p>
+      <pre><code>// A 20mm x 20mm x 20mm cube
+return cube(20);
+
+// A rectangular box (Width=40mm, Depth=30mm, Height=10mm)
+return box(40, 30, 10);</code></pre>
+
+      <h3>Spheres</h3>
+      <p><code>sphere(radius)</code> creates a sphere centered at the origin <code>[0, 0, 0]</code>.</p>
+      <pre><code>// A sphere of radius 15mm (diameter 30mm)
+return sphere(15);</code></pre>
+
+      <h3>Cylinders and Cones</h3>
+      <p>Both are centered on the XY plane and extend along the positive Z axis from <code>z = 0</code> to <code>z = height</code>.</p>
+      <pre><code>// Cylinder with radius 10mm and height 40mm
+return cylinder(10, 40);
+
+// Cone tapering to a point: top radius 0, bottom radius 15mm, height 30mm
+return cone(0, 15, 30);
+
+// Truncated cone (top radius 8mm, bottom radius 15mm, height 30mm)
+return cone(8, 15, 30);</code></pre>
+
+      <h3>Torus</h3>
+      <p><code>torus(radius, tubeRadius)</code> creates a ring centered at the origin lying flat on the XY plane.</p>
+      <pre><code>// Major ring radius 25mm, tube thickness radius 4mm
+return torus(25, 4);</code></pre>
+
+      <h2>3. Chainable Transformations</h2>
+      <p>Apply moves, rotations, scaling, or mirroring by chaining methods directly on any geometry object.</p>
+
+      <h3>Moving (Translation)</h3>
+      <p>Shift a shape by offset values along X, Y, and Z axes:</p>
+      <pre><code>// Move a 20mm cube by 15mm on X, and 5mm on Z
+return cube(20).move(15, 0, 5);</code></pre>
+
+      <h3>Rotating</h3>
+      <p>Rotate a shape around X, Y, and Z axes. <strong>Angles are specified in degrees</strong>:</p>
+      <pre><code>// Rotate a box 45 degrees around the Z axis (yaw)
+return box(30, 10, 10).rotate(0, 0, 45);</code></pre>
+
+      <h3>Scaling</h3>
+      <p>Resize shapes. Passing a single number performs uniform scaling; passing three numbers scales X, Y, and Z independently.</p>
+      <pre><code>// Double in length on X, shrink by half on Y
+return sphere(10).scale(2, 0.5, 1);</code></pre>
+
+      <h3>Mirroring</h3>
+      <p>Flipped geometry across a coordinate plane (<code>'x'</code>, <code>'y'</code>, or <code>'z'</code>):</p>
+      <pre><code>// Mirror a sloped shape across the X-axis plane
+return cone(0, 10, 20).mirror('x');</code></pre>
+
+      <h2>4. Boolean Operations</h2>
+      <p>Solid modeling allows you to combine shapes in three ways:</p>
+      
+      <h3>Union</h3>
+      <p>Joins multiple shapes into a single solid body.</p>
+      <pre><code>const block = box(40, 20, 10);
+const peg = cylinder(5, 20).move(20, 10, 0);
+
+return union(block, peg);</code></pre>
+
+      <h3>Subtract</h3>
+      <p>Cuts tool shapes out of a base shape. Ideal for screw holes, hollow boxes, or slots.</p>
+      <pre><code>const base = cube(30);
+// Drill a 10mm diameter hole through the center of the cube
+const drillBit = cylinder(5, 40).move(15, 15, -5);
+
+return subtract(base, drillBit);</code></pre>
+
+      <h3>Intersect</h3>
+      <p>Finds the common volume shared by all shapes.</p>
+      <pre><code>return intersect(
+  cube(30),
+  sphere(20).move(15, 15, 15)
+);</code></pre>
+
+      <h2>5. Dynamic Parametric Controls</h2>
+      <p>You can create sliders, checkboxes, and select menus that draw in the controls panel on-the-fly. Adjusting these controls rebuilds the model instantly.</p>
+      
+      <ul>
+        <li><code>slider(name, default, min, max)</code>: Returns a number.</li>
+        <li><code>checkbox(name, default)</code>: Returns `true` or `false`.</li>
+        <li><code>select(name, default, optionsArray)</code>: Returns the selected string option.</li>
+      </ul>
+
+      <pre><code>// Register inputs
+const length = slider("Width", 50, 20, 100);
+const wall = slider("Thickness", 4, 2, 8);
+const hollow = checkbox("Hollow Out", true);
+
+const outer = box(length, 40, 30);
+
+if (hollow) {
+  const inner = box(length - wall*2, 40 - wall*2, 30)
+    .move(wall, wall, wall);
+  return subtract(outer, inner);
+}
+
+return outer;</code></pre>
+
+      <h2>6. Advanced Modeling: Loops and Math</h2>
+      <p>Because ShapeScript is pure JavaScript, you can use loops, variables, and trigonometry to create complex mechanical or decorative items.</p>
+      
+      <h3>Example: Circular Pattern (Gear Teeth)</h3>
+      <pre><code>const teethCount = 12;
+const coreRadius = 20;
+const thick = 8;
+
+const gearCore = cylinder(coreRadius, thick);
+let gear = gearCore;
+
+for (let i = 0; i < teethCount; i++) {
+  // Angle for this tooth in degrees
+  const angle = (i * 360) / teethCount;
+  
+  // Single tooth cylinder, moved to outer radius, and rotated
+  const tooth = box(4, 8, thick)
+    .move(-2, coreRadius - 2, 0)
+    .rotate(0, 0, angle);
+    
+  gear = union(gear, tooth);
+}
+
+return gear;</code></pre>
+    </main>
+  </div>
+</body>
+</html>
