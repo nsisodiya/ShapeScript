@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShapeScript - 3D Scripting for Makers</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body class="cad-theme">
+  <!-- Top Toolbar -->
+  <header class="toolbar" role="banner">
+    <div class="toolbar-brand">
+      <svg class="logo" viewBox="0 0 24 24" width="24" height="24">
+        <path fill="currentColor" d="M12 2L2 22h20L12 2zm0 4.8L18.4 19H5.6L12 6.8z"/>
+      </svg>
+      <h1>ShapeScript</h1>
+    </div>
+    
+    <div class="toolbar-section files-section">
+      <div class="select-wrapper">
+        <select id="file-selector" title="Switch File"></select>
+      </div>
+      <button id="btn-new-file" title="Create New Script" class="btn btn-secondary">
+        <span class="icon">+</span> New
+      </button>
+      <button id="btn-rename-file" title="Rename Current File" class="btn btn-secondary">
+        Rename
+      </button>
+      <button id="btn-delete-file" title="Delete Current File" class="btn btn-danger">
+        Delete
+      </button>
+    </div>
+    
+    <div class="toolbar-divider"></div>
+    
+    <div class="toolbar-section actions-section">
+      <button id="btn-save" title="Save file to LocalStorage" class="btn btn-secondary">
+        Save
+      </button>
+      <div class="select-wrapper">
+        <select id="example-selector" title="Load Example">
+          <option value="" disabled selected>Load Example...</option>
+          <option value="cube">Cube</option>
+          <option value="box">Box</option>
+          <option value="phone-stand">Phone Stand</option>
+          <option value="hook">Hook</option>
+          <option value="storage-tray">Storage Tray</option>
+          <option value="gear">Gear</option>
+          <option value="knob">Knob</option>
+          <option value="vase">Vase</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="toolbar-section right-section">
+      <button id="btn-reset-camera" title="Reset Viewport Camera" class="btn btn-secondary">
+        Reset Camera
+      </button>
+      <button id="btn-download-stl" title="Export Binary STL" class="btn btn-primary">
+        <span class="icon">↓</span> Download STL
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Split Layout -->
+  <main class="main-layout" role="main">
+    <!-- Left Pane: Editor & Parametric Controls -->
+    <section class="pane left-pane" id="left-pane" aria-label="Editor and Controls">
+      <div class="editor-header">
+        <span class="panel-title">script.js</span>
+        <span id="save-status" class="save-status-indicator">Saved</span>
+      </div>
+      
+      <div class="editor-container-wrapper">
+        <div id="editor-container" class="editor-container"></div>
+      </div>
+      
+      <div class="controls-panel-wrapper" id="controls-panel-wrapper">
+        <div class="controls-header">
+          <span class="panel-title">Parametric Controls</span>
+        </div>
+        <div id="controls-panel" class="controls-panel">
+          <p class="no-controls-msg">No dynamic controls registered. Use <code>slider()</code>, <code>checkbox()</code>, or <code>select()</code> in your script.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Resizer bar -->
+    <div class="resizer" id="pane-resizer" role="separator" aria-valuenow="40" aria-valuemin="10" aria-valuemax="90" tabindex="0" title="Drag to resize panes"></div>
+
+    <!-- Right Pane: Viewport -->
+    <section class="pane right-pane" id="right-pane" aria-label="3D Viewport">
+      <div id="viewport-container" class="viewport-container"></div>
+    </section>
+  </main>
+
+  <!-- Bottom Status Bar -->
+  <footer class="status-bar" role="contentinfo">
+    <div class="status-group">
+      <span class="status-label">Status:</span>
+      <span id="render-status" class="status-value status-idle">Idle</span>
+    </div>
+    <div class="status-group error-group hidden" id="status-error-container">
+      <span class="status-label error-label">Error:</span>
+      <span id="error-message" class="status-value error-value">None</span>
+    </div>
+    <div class="status-group push-right">
+      <span class="status-label">Triangles:</span>
+      <span id="triangle-count" class="status-value">0</span>
+    </div>
+    <div class="status-divider"></div>
+    <div class="status-group">
+      <span class="status-label">Render Time:</span>
+      <span id="render-time" class="status-value">0ms</span>
+    </div>
+  </footer>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
