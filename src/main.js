@@ -460,6 +460,41 @@ function renderControlsPanel(controls) {
       // Empty element to maintain grid alignment
       const spacer = document.createElement('span');
       row.appendChild(spacer);
+    } else if (c.type === 'colorPicker') {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'color-picker-wrapper';
+
+      // Native color swatch input
+      const input = document.createElement('input');
+      input.type = 'color';
+      input.className = 'control-color-input';
+      input.value = currentVal || c.defaultValue || '#ffffff';
+
+      // Hex label next to the swatch
+      const hexLabel = document.createElement('span');
+      hexLabel.className = 'control-color-hex';
+      hexLabel.textContent = input.value.toUpperCase();
+
+      // oninput: update the live hex label while the picker is open (no re-render!)
+      input.oninput = (e) => {
+        hexLabel.textContent = e.target.value.toUpperCase();
+      };
+
+      // onchange: fires when the user CLOSES/CONFIRMS the color dialog — safe to re-render
+      input.onchange = (e) => {
+        const val = e.target.value;
+        hexLabel.textContent = val.toUpperCase();
+        controlValues[c.name] = val;
+        executeCode();
+      };
+
+      wrapper.appendChild(input);
+      wrapper.appendChild(hexLabel);
+      row.appendChild(wrapper);
+
+      // Spacer to maintain grid alignment
+      const spacer2 = document.createElement('span');
+      row.appendChild(spacer2);
     }
     
     panel.appendChild(row);

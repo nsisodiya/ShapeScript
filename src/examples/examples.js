@@ -248,5 +248,38 @@ const inner = union(innerLower, innerUpper).move(0, 0, wallThickness);
 // 3. Subtract to hollow out
 return subtract(outer, inner);
 `
+  },
+  'color-demo': {
+    name: 'Color Picker Demo',
+    code: `// Color Picker Demo
+// Shows colorPicker(), hex strings, and multi-part colored models.
+// Edit the color swatches in the Controls panel!
+
+const bodyColor = colorPicker('Body Color',   '#3b82f6');
+const capColor  = colorPicker('Cap Color',    '#f59e0b');
+const pinColor  = colorPicker('Pin Color',    '#22c55e');
+
+const height = slider('Height', 40, 20, 80);
+const radius = slider('Radius', 14, 8, 25);
+
+// Main cylinder body — hex color from picker
+const body = cylinder(radius, height).color(bodyColor);
+
+// Top cap dome — different picker
+const cap = sphere(radius)
+  .move(0, 0, height)
+  .color(capColor);
+
+// Center pin
+const pin = cylinder(3, height + radius + 4)
+  .move(0, 0, -2)
+  .color(pinColor);
+
+// Hollow out the body
+const cavity = cylinder(radius - 3, height - 2).move(0, 0, 2);
+const hollowBody = subtract(body, cavity);
+
+return union(hollowBody, cap, pin);
+`
   }
 };

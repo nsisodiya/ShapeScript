@@ -7,7 +7,7 @@
  *
  * HOW TO ADD A NEW API:
  *   1. Find the relevant section below (or add a new section object).
- *   2. Add an entry to `entries[]` with: name, signature, description, codeExample.
+ *   2. Add an entry to `entries[]` with: name, signatures, description, codeExample.
  *   3. Save. The tutorial page reflects the change on next reload — no HTML editing needed.
  */
 
@@ -36,7 +36,7 @@ dragging shapes, you write standard JavaScript code. Every script must
 creates a cuboid. Both are anchored in the positive octant, stretching from
 <code>0</code> to the defined dimension on all axes.`,
         codeExample:
-`// A 20mm × 20mm × 20mm cube
+`// A 20mm x 20mm x 20mm cube
 return cube(20);
 
 // A rectangular box (Width=40mm, Depth=30mm, Height=10mm)
@@ -105,7 +105,7 @@ return cube(20).move(15, 0, 5);`
         signatures: ['.rotate(ax, ay, az)'],
         description: 'Rotate a shape around X, Y, and Z axes. <strong>Angles are in degrees.</strong>',
         codeExample:
-`// Rotate a box 45° around the Z axis
+`// Rotate a box 45 degrees around the Z axis
 return box(30, 10, 10).rotate(0, 0, 45);`
       },
       {
@@ -172,30 +172,59 @@ return subtract(base, drillBit);`
   {
     id: 'colors',
     title: '5. Colors',
-    intro: `Assign colors to shapes using the chainable <code>.color()</code> method.
-Colors survive Boolean operations — each part of a union or subtraction keeps its
-own color, making it easy to build visually distinct multi-part models.
-Colors are displayed in the 3D viewport but are <em>not</em> stored in exported STL files
-(STL is geometry-only).`,
+    intro: `Assign colors to shapes using the chainable <code>.color()</code> method or the
+interactive <code>colorPicker()</code> control. Colors survive Boolean operations — each
+part of a union or subtraction keeps its own color. Colors are visible in the 3D viewport
+but are <em>not</em> stored in exported STL files (STL is geometry-only).`,
     entries: [
       {
-        name: 'Color',
-        signatures: ['.color(r, g, b)'],
-        description: `Assigns an RGB color to a shape. Values can be in the <strong>0.0–1.0</strong>
-float range or the <strong>0–255</strong> integer range — ShapeScript auto-detects which
-you are using. Returns a new colored CSG object (chainable).`,
+        name: '.color() — Hex String',
+        signatures: ['.color(hexString)'],
+        description: `Pass a CSS hex string. Both <code>#rrggbb</code> (6-digit) and
+<code>#rgb</code> (3-digit shorthand) are supported.`,
         codeExample:
-`// Float range (0.0 – 1.0)
-return cube(20).color(0.18, 0.71, 0.69); // Teal
+`// 6-digit hex
+return cube(20).color('#1db48f');
 
-// Integer range (0 – 255) — auto-detected
-return sphere(15).color(255, 80, 40);    // Coral
+// 3-digit shorthand (#f40 expands to #ff4400)
+return sphere(15).color('#f40');
 
-// Multi-part model with per-part colors
-const body = box(60, 40, 20).color(0.22, 0.47, 0.80); // Blue
-const peg  = cylinder(6, 30).move(30, 20, 20).color(0.95, 0.55, 0.10); // Orange
+// Chains with other transforms
+return box(50, 30, 20).rotate(0, 0, 30).color('#a855f7');`
+      },
+      {
+        name: '.color() — RGB Numbers',
+        signatures: ['.color(r, g, b)'],
+        description: `Pass three numbers. ShapeScript auto-detects the range:
+<strong>0.0-1.0</strong> floats or <strong>0-255</strong> integers.`,
+        codeExample:
+`// Floats 0.0-1.0
+return cube(20).color(0.18, 0.71, 0.69);  // teal
 
+// Integers 0-255 (auto-detected because values > 1)
+return sphere(15).color(255, 80, 40);     // coral
+
+// Multi-part model, each part a different color
+const body = box(60, 40, 20).color(0.22, 0.47, 0.80);
+const peg  = cylinder(6, 30).move(30, 20, 20).color('#f59e0b');
 return union(body, peg);`
+      },
+      {
+        name: 'colorPicker() — Interactive Color Swatch',
+        signatures: ['colorPicker(name, defaultHex)'],
+        description: `Registers an interactive color-picker swatch in the controls panel.
+Returns a hex string (e.g. <code>'#3b82f6'</code>) that you can pass directly to
+<code>.color()</code>. Changing the picker instantly re-renders the model — no typing needed.`,
+        codeExample:
+`// Declare two color pickers — they appear in the controls panel
+const bodyColor   = colorPicker('Body Color',   '#3b82f6');
+const detailColor = colorPicker('Detail Color', '#f59e0b');
+
+// Use the returned hex strings with .color()
+const body   = box(60, 40, 20).color(bodyColor);
+const detail = cylinder(6, 25).move(30, 20, 20).color(detailColor);
+
+return union(body, detail);`
       }
     ]
   },
@@ -204,25 +233,25 @@ return union(body, peg);`
   {
     id: 'controls',
     title: '6. Dynamic Parametric Controls',
-    intro: `You can create sliders, checkboxes, and select menus that appear in the
-controls panel on the fly. Adjusting these controls rebuilds the model instantly
-without needing to re-type code.`,
+    intro: `You can create sliders, checkboxes, select menus, and color pickers that appear
+in the controls panel on the fly. Adjusting any control instantly rebuilds the model
+without re-typing code.`,
     entries: [
       {
         name: 'Slider',
         signatures: ['slider(name, default, min, max)'],
         description: 'Returns a number. Renders as a range slider in the controls panel.',
         codeExample:
-`const size = slider("Cube Size", 25, 10, 80);
-return cube(size).color(0.18, 0.71, 0.69);`
+`const size = slider('Cube Size', 25, 10, 80);
+return cube(size).color('#1db48f');`
       },
       {
         name: 'Checkbox',
         signatures: ['checkbox(name, default)'],
         description: 'Returns <code>true</code> or <code>false</code>.',
         codeExample:
-`const hollow = checkbox("Hollow Out", true);
-const outer  = box(50, 40, 30).color(0.22, 0.47, 0.80);
+`const hollow = checkbox('Hollow Out', true);
+const outer  = box(50, 40, 30).color('#3b82f6');
 
 if (hollow) {
   const inner = box(44, 34, 28).move(3, 3, 2);
@@ -235,11 +264,21 @@ return outer;`
         signatures: ['select(name, default, optionsArray)'],
         description: 'Returns the selected string option. Renders as a dropdown.',
         codeExample:
-`const shape = select("Shape", "cube", ["cube", "sphere", "cylinder"]);
+`const shape = select('Shape', 'cube', ['cube', 'sphere', 'cylinder']);
 
-if (shape === "cube")     return cube(25).color(0.85, 0.25, 0.25);
-if (shape === "sphere")   return sphere(15).color(0.25, 0.75, 0.40);
-if (shape === "cylinder") return cylinder(12, 30).color(0.25, 0.50, 0.90);`
+if (shape === 'cube')     return cube(25).color('#ef4444');
+if (shape === 'sphere')   return sphere(15).color('#22c55e');
+if (shape === 'cylinder') return cylinder(12, 30).color('#3b82f6');`
+      },
+      {
+        name: 'Color Picker',
+        signatures: ['colorPicker(name, defaultHex)'],
+        description: `Returns a hex string. Renders as a native color swatch in the controls
+panel — click it to open the OS color chooser. See the <strong>Colors</strong> section
+above for full usage.`,
+        codeExample:
+`const col = colorPicker('Shape Color', '#6366f1');
+return torus(20, 5).color(col);`
       }
     ]
   },
@@ -281,11 +320,12 @@ return gear;`
 JavaScript expression. All angles in ShapeScript's own API use degrees, but raw
 <code>Math</code> functions use radians as usual.`,
         codeExample:
-`// Place 8 spheres in a ring
-let scene = cylinder(5, 5).color(0.9, 0.9, 0.9); // center post
+`// Place 8 spheres in a rainbow ring
+const col = colorPicker('Ring Color', '#6366f1');
+let scene = cylinder(5, 5).color(col);
 
 for (let i = 0; i < 8; i++) {
-  const angle = (i / 8) * Math.PI * 2; // radians for Math.cos/sin
+  const angle = (i / 8) * Math.PI * 2;
   const x = Math.cos(angle) * 30;
   const y = Math.sin(angle) * 30;
   const ball = sphere(5).move(x, y, 5).color(i / 8, 0.4, 1 - i / 8);

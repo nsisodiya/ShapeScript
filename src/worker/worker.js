@@ -144,7 +144,20 @@ globalThis.select = (name, defaultValue, options) => {
   return defaultValue;
 };
 
-// Listen for execution commands from the main thread
+// colorPicker(name, defaultHex) returns a CSS hex string like '#ff4400'.
+// Use it directly with .color(): cube(20).color(colorPicker("Body", '#3399ff'))
+globalThis.colorPicker = (name, defaultValue) => {
+  const def = defaultValue || '#ffffff';
+  if (!registeredControls.some(c => c.name === name)) {
+    registeredControls.push({ name, type: 'colorPicker', defaultValue: def });
+  }
+  if (currentControlValues[name] !== undefined) {
+    return String(currentControlValues[name]);
+  }
+  return def;
+};
+
+
 self.onmessage = function(e) {
   const { code, controlValues } = e.data;
   

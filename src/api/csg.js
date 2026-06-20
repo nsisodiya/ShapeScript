@@ -320,12 +320,13 @@ export class CSG {
     return csg;
   }
 
-  // Assign an RGB color (0–255 range or 0.0–1.0 range, auto-detected) to all polygons.
+  // Assign an RGB color to all polygons. Accepts:
+  //   .color('#rrggbb') or .color('#rgb')  -- CSS hex string
+  //   .color(r, g, b)                       -- floats 0.0-1.0
+  //   .color(r, g, b)                       -- ints 0-255 (auto-detected)
   // Returns a new CSG with the color tagged on every polygon's `shared` field.
   color(r, g, b) {
-    // Normalise: if any component > 1, assume 0-255 range
-    const scale = (r > 1 || g > 1 || b > 1) ? 1 / 255 : 1;
-    const col = { r: r * scale, g: g * scale, b: b * scale };
+    const col = CSG._parseColor(r, g, b);
     return CSG.fromPolygons(
       this.polygons.map(p => {
         const clone = p.clone();
@@ -333,6 +334,26 @@ export class CSG {
         return clone;
       })
     );
+  }
+
+  // Internal: normalise any supported color format to { r, g, b } in 0-1 range.
+  static _parseColor(r, g, b) {
+    if (typeof r === 'string') {
+      // Hex string: '#rrggbb' or '#rgb'
+      let hex = r.replace(/^#/, '');
+      if (hex.length === 3) {
+        hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+      }
+      if (hex.length !== 6) throw new Error('Invalid hex color: "' + r + '"');
+      return {
+        r: parseInt(hex.slice(0, 2), 16) / 255,
+        g: parseInt(hex.slice(2, 4), 16) / 255,
+        b: parseInt(hex.slice(4, 6), 16) / 255
+      };
+    }
+    // Float 0-1 or int 0-255 (auto-detect by magnitude)
+    const scale = (r > 1 || g > 1 || b > 1) ? 1 / 255 : 1;
+    return { r: r * scale, g: g * scale, b: b * scale };
   }
 
   // --- Transformations ---

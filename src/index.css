@@ -402,6 +402,43 @@ select:focus {
   font-weight: bold;
 }
 
+/* Color Picker input */
+.color-picker-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.control-color-input {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 32px;
+  height: 28px;
+  border: 2px solid var(--color-border);
+  border-radius: 6px;
+  cursor: pointer;
+  background: none;
+  padding: 0;
+  outline: none;
+  transition: border-color 0.15s ease, transform 0.1s ease;
+  flex-shrink: 0;
+}
+
+.control-color-input::-webkit-color-swatch-wrapper { padding: 0; }
+.control-color-input::-webkit-color-swatch { border: none; border-radius: 4px; }
+
+.control-color-input:hover {
+  border-color: var(--color-accent);
+  transform: scale(1.08);
+}
+
+.control-color-hex {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.05em;
+}
+
 /* Viewport Container */
 .viewport-container {
   width: 100%;
