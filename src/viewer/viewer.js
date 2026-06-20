@@ -99,7 +99,7 @@ export class Viewport {
     }
   }
 
-  updateGeometry(positions, normals) {
+  updateGeometry(positions, normals, colors) {
     // Remove existing mesh and dispose buffers
     if (this.mesh) {
       this.scene.remove(this.mesh);
@@ -117,19 +117,28 @@ export class Viewport {
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     geometry.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
 
-    // Material: Physically Based Material (PBM), Light grey, semi-glossy, double-sided
+    // Material: Physically Based, semi-glossy, double-sided, with per-vertex color support
     const material = new THREE.MeshStandardMaterial({
-      color: 0xe0e0e0,
+      vertexColors: true,
       roughness: 0.35,
       metalness: 0.1,
       side: THREE.DoubleSide
     });
 
+    // Supply vertex colors (or fall back to a neutral grey if none provided)
+    if (colors && colors.length === positions.length) {
+      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    } else {
+      // Build a flat grey color buffer matching the vertex count
+      const grey = new Float32Array(positions.length).fill(0.878);
+      geometry.setAttribute('color', new THREE.BufferAttribute(grey, 3));
+    }
+
     this.mesh = new THREE.Mesh(geometry, material);
     
     // Add sharp edge lines overlay for a clean CAD visual style
     const edgesGeom = new THREE.EdgesGeometry(geometry, 25); // threshold angle 25 degrees
-    const lineMat = new THREE.LineBasicMaterial({ color: 0x444444, linewidth: 1.5 });
+    const lineMat = new THREE.LineBasicMaterial({ color: 0x333333, linewidth: 1.5 });
     const lineSegments = new THREE.LineSegments(edgesGeom, lineMat);
     this.mesh.add(lineSegments);
 

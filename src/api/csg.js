@@ -166,7 +166,7 @@ export class Plane {
 export class Polygon {
   constructor(vertices, shared) {
     this.vertices = vertices;
-    this.shared = shared;
+    this.shared = shared || null;
     this.plane = Plane.fromPoints(vertices[0].pos, vertices[1].pos, vertices[2].pos);
   }
 
@@ -318,6 +318,21 @@ export class CSG {
     const csg = this.clone();
     csg.polygons.map(p => p.flip());
     return csg;
+  }
+
+  // Assign an RGB color (0–255 range or 0.0–1.0 range, auto-detected) to all polygons.
+  // Returns a new CSG with the color tagged on every polygon's `shared` field.
+  color(r, g, b) {
+    // Normalise: if any component > 1, assume 0-255 range
+    const scale = (r > 1 || g > 1 || b > 1) ? 1 / 255 : 1;
+    const col = { r: r * scale, g: g * scale, b: b * scale };
+    return CSG.fromPolygons(
+      this.polygons.map(p => {
+        const clone = p.clone();
+        clone.shared = col;
+        return clone;
+      })
+    );
   }
 
   // --- Transformations ---

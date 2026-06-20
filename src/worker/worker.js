@@ -105,6 +105,12 @@ globalThis.intersect = (...objects) => {
   return result;
 };
 
+// Color: cube(20).color(1, 0.3, 0.2) or cube(20).color(255, 80, 50)
+globalThis.color = (shape, r, g, b) => {
+  if (!(shape instanceof CSG)) throw new Error("color() first argument must be a CSG object");
+  return shape.color(r, g, b);
+};
+
 // Parametric controls registration and read hooks
 globalThis.slider = (name, defaultValue, min, max) => {
   // Ensure the control is registered
@@ -173,12 +179,22 @@ self.onmessage = function(e) {
     
     const positions = new Float32Array(numVertices * 3);
     const normals = new Float32Array(numVertices * 3);
+    const colors = new Float32Array(numVertices * 3);
+    
+    // Default grey for uncolored polygons
+    const DEFAULT_R = 0.878, DEFAULT_G = 0.878, DEFAULT_B = 0.878;
     
     let vIdx = 0;
     for (let i = 0; i < polygons.length; i++) {
       const poly = polygons[i];
       const verts = poly.vertices;
       const numV = verts.length;
+      
+      // Resolve color for this polygon
+      const col = poly.shared;
+      const cr = col ? col.r : DEFAULT_R;
+      const cg = col ? col.g : DEFAULT_G;
+      const cb = col ? col.b : DEFAULT_B;
       
       // Convex polygon triangulation using fan method
       for (let j = 1; j < numV - 1; j++) {
@@ -192,6 +208,9 @@ self.onmessage = function(e) {
         normals[vIdx * 3]       = v0.normal.x;
         normals[vIdx * 3 + 1]   = v0.normal.y;
         normals[vIdx * 3 + 2]   = v0.normal.z;
+        colors[vIdx * 3]        = cr;
+        colors[vIdx * 3 + 1]    = cg;
+        colors[vIdx * 3 + 2]    = cb;
         vIdx++;
         
         positions[vIdx * 3]     = v1.pos.x;
@@ -200,6 +219,9 @@ self.onmessage = function(e) {
         normals[vIdx * 3]       = v1.normal.x;
         normals[vIdx * 3 + 1]   = v1.normal.y;
         normals[vIdx * 3 + 2]   = v1.normal.z;
+        colors[vIdx * 3]        = cr;
+        colors[vIdx * 3 + 1]    = cg;
+        colors[vIdx * 3 + 2]    = cb;
         vIdx++;
         
         positions[vIdx * 3]     = v2.pos.x;
@@ -208,6 +230,9 @@ self.onmessage = function(e) {
         normals[vIdx * 3]       = v2.normal.x;
         normals[vIdx * 3 + 1]   = v2.normal.y;
         normals[vIdx * 3 + 2]   = v2.normal.z;
+        colors[vIdx * 3]        = cr;
+        colors[vIdx * 3 + 1]    = cg;
+        colors[vIdx * 3 + 2]    = cb;
         vIdx++;
       }
     }
@@ -217,10 +242,11 @@ self.onmessage = function(e) {
       success: true,
       positions,
       normals,
+      colors,
       registeredControls,
       renderTimeMs,
       triangleCount: numVertices / 3
-    }, [positions.buffer, normals.buffer]);
+    }, [positions.buffer, normals.buffer, colors.buffer]);
     
   } catch (err) {
     // Parse line numbers from the error stack trace

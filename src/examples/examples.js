@@ -6,7 +6,7 @@ export const Examples = {
 
 const size = slider("Cube Size", 25, 10, 80);
 
-return cube(size);
+return cube(size).color(0.18, 0.71, 0.69); // Vibrant teal
 `
   },
 
@@ -19,7 +19,7 @@ const w = slider("Width", 50, 10, 100);
 const d = slider("Depth", 30, 10, 100);
 const h = slider("Height", 20, 10, 100);
 
-return box(w, d, h);
+return box(w, d, h).color(0.96, 0.51, 0.19); // Warm amber
 `
   },
 
@@ -35,15 +35,18 @@ const lipHeight = slider("Lip Height", 15, 10, 30);
 const wall = 6; // Stand thickness in mm
 
 // Base Plate
-const base = box(width, depth, wall);
+const base = box(width, depth, wall).color(0.22, 0.47, 0.80); // Steel blue
 
 // Back Support
 const back = box(width, wall, 65)
   .move(0, depth - wall, 0)
-  .rotate(-90 + angle, 0, 0); // Tilt back
+  .rotate(-90 + angle, 0, 0)
+  .color(0.15, 0.36, 0.65); // Darker blue
 
 // Front Lip
-const lip = box(width, wall * 1.5, lipHeight).move(0, 0, 0);
+const lip = box(width, wall * 1.5, lipHeight)
+  .move(0, 0, 0)
+  .color(0.29, 0.60, 0.93); // Lighter accent blue
 
 // Combine
 const stand = union(base, back, lip);
@@ -65,18 +68,20 @@ const pegAngle = slider("Peg Angle", 20, 0, 45);
 
 const wall = 4;
 
-// Back mounting plate
-const plate = box(mountWidth, wall, mountHeight);
+// Back mounting plate — deep red
+const plate = box(mountWidth, wall, mountHeight).color(0.85, 0.13, 0.18);
 
-// Hook peg extending outwards (along Y axis)
+// Hook peg extending outwards (along Y axis) — coral
 const peg = box(8, pegLength, 8)
   .move((mountWidth - 8) / 2, -pegLength, 15)
-  .rotate(-pegAngle, 0, 0);
+  .rotate(-pegAngle, 0, 0)
+  .color(0.95, 0.35, 0.30);
 
-// Stop tip on the end of the peg
+// Stop tip on the end of the peg — lighter accent
 const tip = box(8, 6, 14)
   .move((mountWidth - 8) / 2, -pegLength - 6, 12)
-  .rotate(-pegAngle, 0, 0);
+  .rotate(-pegAngle, 0, 0)
+  .color(1.0, 0.55, 0.45);
 
 return union(plate, peg, tip);
 `
@@ -93,7 +98,7 @@ const height = slider("Height (Z)", 25, 15, 60);
 const wall = slider("Wall Thickness", 3.5, 2, 8);
 const compartments = select("Compartments", "2x1", ["1x1", "2x1", "3x1", "2x2"]);
 
-const body = box(length, width, height);
+const body = box(length, width, height).color(0.18, 0.48, 0.76); // Ocean blue
 
 // Helper function to create hollow cutouts
 let cavities = [];
@@ -149,19 +154,20 @@ const innerRadius = 24;
 const outerRadius = 28;
 const toothWidth = 6;
 
-// Central Gear Core
-const core = cylinder(innerRadius, thickness);
+// Central Gear Core — metallic silver-grey
+const core = cylinder(innerRadius, thickness).color(0.75, 0.78, 0.82);
 
 let gear = core;
 
-// Add teeth radially
+// Add teeth radially — slightly lighter accent
 for (let i = 0; i < teeth; i++) {
   const angle = (i * 360) / teeth;
   
   // Single tooth box shifted outward along Y and rotated
   const tooth = box(toothWidth, 12, thickness)
     .move(-toothWidth / 2, innerRadius - 4, 0)
-    .rotate(0, 0, angle);
+    .rotate(0, 0, angle)
+    .color(0.62, 0.65, 0.70);
     
   gear = union(gear, tooth);
 }
@@ -185,22 +191,24 @@ const radius = slider("Knob Radius", 22, 12, 35);
 const height = slider("Knob Height", 18, 10, 30);
 const ridgeCount = slider("Ridge Count", 16, 8, 30);
 
-// Base cylinder body
-const mainBody = cylinder(radius, height);
+// Base cylinder body — deep violet
+const mainBody = cylinder(radius, height).color(0.42, 0.18, 0.72);
 let knob = mainBody;
 
-// Create side grip ridges
+// Create side grip ridges — lighter purple
 for (let i = 0; i < ridgeCount; i++) {
   const angle = (i * 360) / ridgeCount;
   const ridge = cylinder(1.5, height)
     .move(radius - 0.75, 0, 0)
-    .rotate(0, 0, angle);
+    .rotate(0, 0, angle)
+    .color(0.62, 0.38, 0.92);
   knob = union(knob, ridge);
 }
 
-// Indicator pointer notch on top
+// Indicator pointer notch on top — bright accent
 const indicator = box(3, 8, 4)
-  .move(-1.5, radius - 7, height - 3);
+  .move(-1.5, radius - 7, height - 3)
+  .color(0.98, 0.82, 0.10);
 const finalOuter = union(knob, indicator);
 
 // D-shaft mounting hole on the bottom
@@ -227,18 +235,17 @@ const waistR = slider("Waist Radius", 28, 15, 50);
 const lipR = slider("Lip Radius", 22, 10, 40);
 const wallThickness = 3;
 
-// 1. Build Outer Body
-const lowerOuter = cone(waistR, baseR, height / 2);
-const upperOuter = cone(lipR, waistR, height / 2).move(0, 0, height / 2);
+// 1. Build Outer Body — emerald green
+const lowerOuter = cone(waistR, baseR, height / 2).color(0.10, 0.65, 0.42);
+const upperOuter = cone(lipR, waistR, height / 2).move(0, 0, height / 2).color(0.14, 0.78, 0.52);
 const outer = union(lowerOuter, upperOuter);
 
-// 2. Build Inner Cavity
-// Scaled smaller in XY and shifted up on Z to leave a solid base
+// 2. Build Inner Cavity (used for subtraction — color is discarded)
 const innerLower = cone(waistR - wallThickness, baseR - wallThickness, height / 2);
 const innerUpper = cone(lipR - wallThickness, waistR - wallThickness, height / 2).move(0, 0, height / 2);
 const inner = union(innerLower, innerUpper).move(0, 0, wallThickness);
 
-// 3. Subtract
+// 3. Subtract to hollow out
 return subtract(outer, inner);
 `
   }

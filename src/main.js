@@ -309,14 +309,14 @@ function executeCode() {
     const result = e.data;
     
     if (result.success) {
-      const { positions, normals, registeredControls, renderTimeMs, triangleCount } = result;
+      const { positions, normals, colors, registeredControls, renderTimeMs, triangleCount } = result;
       
       // Clear red editor markers
       editor.clearErrors();
       hideErrorPanel();
       
       // Update canvas geometry
-      viewer.updateGeometry(positions, normals);
+      viewer.updateGeometry(positions, normals, colors);
       
       // Update active buffers for STL download
       activePositions = positions;
