@@ -1,4 +1,4 @@
-import { CSG } from '../api/csg.js';
+import { CSG, Group } from '../api/csg.js';
 
 let registeredControls = [];
 let currentControlValues = {};
@@ -158,6 +158,18 @@ globalThis.colorPicker = (name, defaultValue) => {
 };
 
 
+// group(...shapes) — bundle shapes without merging geometry.
+// All transforms (.move, .rotate, .scale, .mirror, .color) propagate to every child.
+// Unlike union(), shapes keep their individual colors and no BSP computation happens.
+globalThis.group = (...shapes) => {
+  for (const s of shapes) {
+    if (!(s instanceof CSG) && !(s instanceof Group)) {
+      throw new Error('group() arguments must be CSG objects or other groups');
+    }
+  }
+  return new Group(shapes);
+};
+
 self.onmessage = function(e) {
   const { code, controlValues } = e.data;
   
@@ -176,8 +188,8 @@ self.onmessage = function(e) {
     if (!model) {
       throw new Error("The script must return a model (e.g., return cube(20);)");
     }
-    if (!(model instanceof CSG)) {
-      throw new Error("The returned object is not a valid CSG model. Check your return statement.");
+    if (!(model instanceof CSG) && !(model instanceof Group)) {
+      throw new Error("The returned object is not a valid CSG model or group. Check your return statement.");
     }
     
     const renderTimeMs = performance.now() - startTime;

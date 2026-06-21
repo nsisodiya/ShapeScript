@@ -646,3 +646,57 @@ export class CSG {
     return CSG.fromPolygons(polygons);
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Group — a lightweight container for multiple CSG objects.
+//
+// Unlike union(), Group does NOT merge geometry through BSP trees.
+// It simply keeps shapes together so you can transform them as a unit.
+//
+// Benefits over union():
+//   • Much faster — no BSP computation.
+//   • Each shape keeps its individual color.
+//   • Shapes can overlap without clipping each other.
+//
+// Usage:
+//   const leg = cylinder(3, 20).color('#8b4513');
+//   const table = group(
+//     box(60, 60, 5).color('#deb887').move(0, 0, 20),
+//     leg.move(5,  5,  0),
+//     leg.move(55, 5,  0),
+//     leg.move(5,  55, 0),
+//     leg.move(55, 55, 0),
+//   );
+//   return table.move(10, 10, 0).rotate(0, 0, 15);
+// ─────────────────────────────────────────────────────────────────────────────
+export class Group {
+  constructor(shapes) {
+    // shapes: array of CSG | Group
+    this.shapes = [...shapes];
+  }
+
+  // Internal: apply a per-shape transform function and return a new Group.
+  _map(fn) {
+    return new Group(this.shapes.map(fn));
+  }
+
+  // All transforms delegate to each child shape (including nested Groups).
+  move(dx, dy, dz)   { return this._map(s => s.move(dx, dy, dz)); }
+  rotate(ax, ay, az) { return this._map(s => s.rotate(ax, ay, az)); }
+  mirror(axis)       { return this._map(s => s.mirror(axis)); }
+
+  scale(sx, sy, sz) {
+    if (sy === undefined) sy = sx;
+    if (sz === undefined) sz = sx;
+    return this._map(s => s.scale(sx, sy, sz));
+  }
+
+  // Apply a color to every shape in the group that doesn't already have one,
+  // or override all colors if you want a uniform tint.
+  color(r, g, b) { return this._map(s => s.color(r, g, b)); }
+
+  // Flatten the entire group tree into a flat polygon array for rendering.
+  toPolygons() {
+    return this.shapes.flatMap(s => s.toPolygons());
+  }
+}

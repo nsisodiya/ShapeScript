@@ -281,5 +281,49 @@ const hollowBody = subtract(body, cavity);
 
 return union(hollowBody, cap, pin);
 `
-  }
+  },
+  'table': {
+    name: 'Table (Group Demo)',
+    code: `// Table — demonstrates group() for grouping without merging.
+// group() is like TinkerCAD's 'Group': shapes stay independent,
+// keep their own colors, and can be transformed together as a unit.
+
+const tableW  = slider('Table Width',  70, 40, 120);
+const tableD  = slider('Table Depth',  50, 30, 90);
+const tableH  = slider('Table Height', 30, 15, 60);
+const legSize = slider('Leg Size',      5,  3, 12);
+
+const topColor = colorPicker('Top Color', '#deb887');
+const legColor = colorPicker('Leg Color', '#8b4513');
+
+const topThick = 4;
+
+// Table top
+const top = box(tableW, tableD, topThick)
+  .move(0, 0, tableH)
+  .color(topColor);
+
+// One leg — we reuse it 4 times by positioning
+const margin = legSize;
+const legHeight = tableH;
+
+const leg = (x, y) =>
+  box(legSize, legSize, legHeight)
+    .move(x, y, 0)
+    .color(legColor);
+
+// Group all parts: transforms on the group affect ALL children
+const tableGroup = group(
+  top,
+  leg(margin,              margin),
+  leg(tableW - margin - legSize, margin),
+  leg(margin,              tableD - margin - legSize),
+  leg(tableW - margin - legSize, tableD - margin - legSize),
+);
+
+// The whole table can be rotated/moved as one unit
+const angle = slider('Rotation', 0, 0, 360);
+return tableGroup.rotate(0, 0, angle);
+`
+  },
 };

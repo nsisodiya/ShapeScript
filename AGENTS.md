@@ -16,7 +16,7 @@ No test/lint/typecheck/formatting tooling is configured.
 - **Entrypoint:** `index.html` → `src/main.js` (vanilla JS, no framework)
 - **CSG engine** (BSP-tree-based): `src/api/csg.js` — the most complex file; implements `cube`, `sphere`, `cylinder`, `cone`, `torus` primitives, Boolean ops (`union`/`subtract`/`intersect`), and chainable transforms (`move`, `rotate`, `scale`, `mirror`, `color`)
 - **User code** runs inside a **Web Worker** (`src/worker/worker.js`) via ES module worker syntax: `new Worker(new URL('./worker/worker.js', import.meta.url), { type: 'module' })`. Worker is terminated on each re-execution. Line numbers in error reports subtract 2 (Function constructor wrapper offset).
-- **API surface** exposed to user scripts: `cube`, `box`, `sphere`, `cylinder`, `cone`, `torus`, `union`, `subtract`, `intersect`, `move`, `rotate`, `scale`, `mirror`, `color`, `slider`, `checkbox`, `select` — all registered on `globalThis` inside the worker.
+- **API surface** exposed to user scripts: `cube`, `box`, `sphere`, `cylinder`, `cone`, `torus`, `union`, `subtract`, `intersect`, `group`, `move`, `rotate`, `scale`, `mirror`, `color`, `colorPicker`, `slider`, `checkbox`, `select` — all registered on `globalThis` inside the worker.
 - **Rendering debounce:** 2000ms after last keystroke. Parametric controls (`slider`/`checkbox`/`select` changes) trigger **immediate** re-execution, cancelling any pending timer.
 - **Storage:** `localStorage`-based filesystem via `src/storage/storage.js`. Auto-save on every keystroke.
 - **STL export:** `src/export/stl.js` — uses `Transferable ArrayBuffers` from worker → main thread.

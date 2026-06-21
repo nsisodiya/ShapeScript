@@ -170,6 +170,62 @@ return subtract(base, drillBit);`
 
   // ─────────────────────────────────────────────────────────────────────────
   {
+    id: 'grouping',
+    title: '5. Grouping',
+    intro: `<code>group()</code> is ShapeScript's equivalent of TinkerCAD's Group button. It bundles shapes into a unit so you can transform them together — without merging geometry via BSP trees.<br><br>Key differences from <code>union()</code>: each shape keeps its own color; no BSP computation (much faster for complex scenes); overlapping parts do not clip each other; groups can be nested.`,
+    entries: [
+      {
+        name: 'group()',
+        signatures: ['group(shape1, shape2, ...)'],
+        description: `Creates a group from any number of CSG shapes or other groups. The returned <code>Group</code> object supports the same chainable transforms as individual shapes: <code>.move()</code>, <code>.rotate()</code>, <code>.scale()</code>, <code>.mirror()</code>, and <code>.color()</code>.`,
+        codeExample:
+`// A reusable leg
+const leg = cylinder(3, 20).color('#8b4513');
+
+// Bundle tabletop + 4 legs into a group
+const table = group(
+  box(60, 60, 4).move(0, 0, 20).color('#deb887'),
+  leg.move( 5,  5, 0),
+  leg.move(52,  5, 0),
+  leg.move( 5, 52, 0),
+  leg.move(52, 52, 0),
+);
+
+// Rotate the whole group as one unit
+return table.rotate(0, 0, 30);`
+      },
+      {
+        name: 'Nested Groups',
+        signatures: ['group(group1, group2, ...)'],
+        description: `Groups can contain other groups for hierarchical assemblies. Each sub-group can be positioned before being nested.`,
+        codeExample:
+`const slatColor = colorPicker('Slat Color', '#c8a46e');
+const slat = box(28, 2, 6).color(slatColor);
+
+// Chair back as a sub-group
+const back = group(
+  slat.move(0, 0, 20),
+  slat.move(0, 0, 28),
+  slat.move(0, 0, 36),
+);
+
+const seat = box(32, 32, 3).color('#deb887');
+const leg  = box(3, 3, 17).color('#8b4513');
+
+// Compose into a chair
+return group(
+  seat,
+  back.move(29, 1, 0),
+  leg.move( 1,  1, 0),
+  leg.move(28,  1, 0),
+  leg.move( 1, 28, 0),
+  leg.move(28, 28, 0),
+);`
+      }
+    ]
+  },
+
+    {
     id: 'colors',
     title: '5. Colors',
     intro: `Assign colors to shapes using the chainable <code>.color()</code> method or the
