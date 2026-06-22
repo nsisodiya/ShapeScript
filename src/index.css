@@ -439,6 +439,137 @@ select:focus {
   letter-spacing: 0.05em;
 }
 
+/* AI Assistant Panel */
+.ai-panel-wrapper {
+  border-top: 1px solid var(--color-border);
+  background-color: var(--color-bg-panel);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.ai-header {
+  height: 36px;
+  background-color: #1f1f1f;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  cursor: pointer;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.ai-header:hover {
+  background-color: #242424;
+}
+
+.ai-spark {
+  color: var(--color-accent-hover);
+  margin-right: 2px;
+}
+
+.ai-collapse-icon {
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+  transition: transform 0.2s ease;
+}
+
+.ai-panel-wrapper.collapsed .ai-collapse-icon {
+  transform: rotate(-90deg);
+}
+
+.ai-panel-wrapper.collapsed .ai-body {
+  display: none;
+}
+
+.ai-body {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ai-prompt {
+  width: 100%;
+  resize: vertical;
+  min-height: 44px;
+  max-height: 160px;
+  background-color: #262626;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  line-height: 1.4;
+  padding: 8px 10px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.ai-prompt:focus {
+  border-color: var(--color-accent);
+}
+
+.ai-prompt::placeholder {
+  color: var(--color-text-muted);
+}
+
+.ai-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ai-actions .btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.ai-status {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 18px;
+}
+
+.ai-status.is-error {
+  color: var(--color-danger);
+}
+
+.ai-status.is-loading {
+  color: var(--color-accent-hover);
+}
+
+.ai-spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: var(--color-accent-hover);
+  border-radius: 50%;
+  animation: ai-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes ai-spin {
+  to { transform: rotate(360deg); }
+}
+
+.ai-explanation {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  background-color: #1a1a1a;
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--color-accent);
+  border-radius: 4px;
+  padding: 8px 10px;
+  line-height: 1.45;
+}
+
 /* Viewport Container */
 .viewport-container {
   width: 100%;

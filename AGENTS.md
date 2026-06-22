@@ -3,13 +3,18 @@
 ## Dev commands
 
 ```bash
-npm install        # install deps (monaco-editor, three, vite)
-npm run dev        # vite dev server → http://localhost:3000
+npm install        # install deps (monaco-editor, three, vite, express, ...)
+npm run dev        # Vite (http://localhost:3000) + Express API (:3002) together
+npm run dev:web    # Vite dev server only
+npm run dev:api    # Express API server only (node server/index.js, port 3002)
 npm run build      # production build → dist/
-npm run preview    # preview production build
+npm run start      # production: Express serves dist/ + /api on PORT (default 3001)
+npm run preview    # preview production build (static only, no API)
 ```
 
 No test/lint/typecheck/formatting tooling is configured.
+
+Copy `.env.example` → `.env` and set `DEEPSEEK_API_KEY` before using the AI assistant.
 
 ## Architecture
 
@@ -22,10 +27,27 @@ No test/lint/typecheck/formatting tooling is configured.
 - **STL export:** `src/export/stl.js` — uses `Transferable ArrayBuffers` from worker → main thread.
 - **Color pipeline:** `.color(r, g, b)` on any CSG object tags polygons via `shared`; worker extracts a `colors Float32Array` and sends it alongside `positions`/`normals`; viewer uses `vertexColors: true` in `MeshStandardMaterial`.
 
+## AI assistant (DeepSeek)
+
+- **Server:** `server/index.js` is an Express app that (a) proxies DeepSeek at `POST /api/ai/chat`, (b) exposes `GET /health` for Cloud Run probes, and (c) in production serves the built SPA from `dist/`. It listens on `process.env.PORT` (Cloud Run injects `8080`), defaulting to `3001` locally.
+- **Key handling:** `DEEPSEEK_API_KEY` is read server-side only (via `dotenv`). It is **never** exposed to the client and must NOT be a `VITE_*` variable.
+- **Prompt:** `server/prompt.js` builds the system prompt by importing `src/docs/api-docs.js` and flattening it to a plain-text API reference, then constructs `generate` / `modify` / `fix` messages. `server/deepseek.js` makes the HTTP call and parses the fenced code block out of the reply.
+- **Frontend:** `src/ai/assistant.js` (the `AIAssistant` class) owns the AI panel in `index.html`. It POSTs to `/api/ai/chat`, then calls `editor.setValue(code)` + `executeCode()`. It is instantiated in `initApp()` in `src/main.js` and reads `lastError` via a `getLastError` callback so the "Fix Error" button is enabled only when the current render failed.
+- **Dev proxy:** `vite.config.js` proxies `/api` → `http://localhost:3001`, so the frontend always calls same-origin `/api/...` in both dev and prod.
+- **Modes:** `generate` (prompt only), `modify` (prompt + current code), `fix` (current code + worker error). Validation + a 20 req / 15 min rate limit live in `server/index.js`.
+
+⚠️ When you change the script API, update `src/docs/api-docs.js` (see rule below). The AI system prompt is derived from it automatically, so keeping it in sync keeps the model accurate.
+
+## Deployment (Docker → Cloud Run)
+
+- `Dockerfile` is multi-stage: build with Vite, then run `node server/index.js` with prod deps only.
+- `.dockerignore` keeps `node_modules`, `.env`, `.git`, and `dist/` out of the build context.
+- Provide `DEEPSEEK_API_KEY` at runtime via Cloud Run env var / Secret Manager — do not bake it into the image.
+
 ## Key patterns
 
 - User script **must** return a CSG object (`return cube(20);`). Worker validates result is an `instanceof CSG`.
-- 100% client-side, offline-first. No backend, no API routes, no database.
+- Client-side rendering + storage; the only backend is the thin AI proxy in `server/` (no database).
 - No routing — single-page `index.html` + `tutorial.html`.
 - `dist/` is gitignored (Vite build output).
 

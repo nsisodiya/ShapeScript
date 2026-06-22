@@ -3,6 +3,7 @@ import { CodeEditor } from './editor/editor.js';
 import { Viewport } from './viewer/viewer.js';
 import { Examples } from './examples/examples.js';
 import { exportBinarySTL } from './export/stl.js';
+import { AIAssistant } from './ai/assistant.js';
 
 // Application State
 let currentFileId = null;
@@ -16,6 +17,10 @@ let editor = null;
 let viewer = null;
 let worker = null;
 let debounceTimer = null;
+let aiAssistant = null;
+
+// Current render error (null when the model is valid). Consumed by the AI "Fix" flow.
+let lastError = null;
 
 // DOM Elements
 const fileSelector = document.getElementById('file-selector');
@@ -59,8 +64,15 @@ function initApp() {
 
   // 6. Bind Event Listeners
   bindEvents();
-  
-  // 7. Initial Render
+
+  // 7. Initialize AI Assistant
+  aiAssistant = new AIAssistant({
+    editor,
+    executeCode,
+    getLastError: () => lastError
+  });
+
+  // 8. Initial Render
   executeCode();
 }
 
@@ -312,8 +324,10 @@ function executeCode() {
       const { positions, normals, colors, registeredControls, renderTimeMs, triangleCount } = result;
       
       // Clear red editor markers
+      lastError = null;
       editor.clearErrors();
       hideErrorPanel();
+      if (aiAssistant) aiAssistant.refreshErrorState();
       
       // Update canvas geometry
       viewer.updateGeometry(positions, normals, colors);
@@ -333,8 +347,10 @@ function executeCode() {
       // Rebuild failed
       const { message, line } = result.error;
       
+      lastError = { message, line: line || null };
       updateStatus('failed', 'Render Failed');
       showErrorPanel(message, line);
+      if (aiAssistant) aiAssistant.refreshErrorState();
       
       // Show squiggle in Monaco editor on the exact line
       if (line) {
@@ -344,8 +360,10 @@ function executeCode() {
   };
   
   worker.onerror = (err) => {
+    lastError = { message: err.message, line: null };
     updateStatus('failed', 'Execution Error');
     showErrorPanel(err.message);
+    if (aiAssistant) aiAssistant.refreshErrorState();
   };
 }
 

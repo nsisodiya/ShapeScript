@@ -80,7 +80,41 @@
       <div class="editor-container-wrapper">
         <div id="editor-container" class="editor-container"></div>
       </div>
-      
+
+      <!-- AI Assistant Panel -->
+      <div class="ai-panel-wrapper" id="ai-panel-wrapper">
+        <div class="ai-header" id="ai-header" role="button" tabindex="0" aria-expanded="true" aria-controls="ai-body">
+          <span class="panel-title">
+            <span class="ai-spark">✦</span> AI Assistant
+          </span>
+          <span class="ai-collapse-icon" id="ai-collapse-icon">▾</span>
+        </div>
+        <div class="ai-body" id="ai-body">
+          <textarea
+            id="ai-prompt"
+            class="ai-prompt"
+            rows="2"
+            placeholder="Describe a model (e.g. &quot;a phone stand at 60 degrees&quot;) or a change (e.g. &quot;add a knob on the drawer&quot;)"
+          ></textarea>
+          <div class="ai-actions">
+            <button id="btn-ai-generate" class="btn btn-primary" title="Generate a new model from your description">
+              <span class="icon">✦</span> Generate
+            </button>
+            <button id="btn-ai-modify" class="btn btn-secondary" title="Modify the current script using your request">
+              Modify
+            </button>
+            <button id="btn-ai-fix" class="btn btn-secondary" title="Ask the AI to fix the current render error" disabled>
+              Fix Error
+            </button>
+            <button id="btn-ai-cancel" class="btn btn-danger hidden" title="Cancel the AI request">
+              Stop
+            </button>
+          </div>
+          <div id="ai-status" class="ai-status hidden"></div>
+          <div id="ai-explanation" class="ai-explanation hidden"></div>
+        </div>
+      </div>
+
       <div class="controls-panel-wrapper" id="controls-panel-wrapper">
         <div class="controls-header">
           <span class="panel-title">Parametric Controls</span>

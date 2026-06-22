@@ -4,16 +4,23 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "start": "vite",
+    "dev": "concurrently -n vite,api -c cyan,magenta \"vite --port 3000 --strictPort\" \"PORT=3002 node server/index.js\"",
+    "dev:web": "vite",
+    "dev:api": "PORT=3002 node server/index.js",
     "build": "vite build",
+    "start": "NODE_ENV=production node server/index.js",
     "preview": "vite preview"
   },
   "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.5.2",
     "monaco-editor": "^0.45.0",
     "three": "^0.160.0"
   },
   "devDependencies": {
+    "concurrently": "^10.0.3",
     "vite": "^5.0.0"
   }
 }

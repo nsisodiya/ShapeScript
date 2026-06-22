@@ -26,6 +26,30 @@ Below is the binary STL exported from ShapeScript imported on the build plate of
 - **LocalStorage Storage System:** Auto-saves your scripts locally. Supports creating, deleting, and renaming files.
 - **Examples Library:** Bootstrapped with 8 examples, including a custom Phone Stand, Gear Maker, wall peg Hook, and Knob.
 - **Binary STL Export:** Compiles triangles into a compact binary format ready for all common slicers (Cura, PrusaSlicer, Bambu Studio).
+- **AI Assistant (DeepSeek):** Describe a model in plain English ("a phone stand at 60 degrees") or ask for a change to the current script ("add a knob on the drawer") and the assistant writes/edits the ShapeScript for you. It can also auto-fix a failing render.
+
+---
+
+## AI Assistant
+
+ShapeScript includes an optional in-app assistant powered by [DeepSeek](https://platform.deepseek.com/).
+
+It lives in the **AI Assistant** panel below the editor and supports three actions:
+
+- **Generate** — create a brand-new model from a natural-language description.
+- **Modify** — apply a change to the script currently in the editor.
+- **Fix Error** — when a render fails, send the code + error to the AI for a fix (enabled only while there is an error).
+
+The DeepSeek API key is held **server-side only** — a small Express server proxies requests so the key never reaches the browser.
+
+> ⚠️ The AI endpoint is currently **public with no authentication**. It is rate-limited (20 requests / 15 min per IP), but exposing it publicly can incur DeepSeek API costs. Add authentication before deploying it widely.
+
+### Configure the key
+
+```bash
+cp .env.example .env
+# then edit .env and set DEEPSEEK_API_KEY=sk-...
+```
 
 ---
 
@@ -38,17 +62,54 @@ Follow these steps to run ShapeScript on your machine:
    npm install
    ```
 
-2. **Start the Development Server:**
+2. **Configure the AI key (optional, for the assistant):**
    ```bash
-   npm start
+   cp .env.example .env   # then set DEEPSEEK_API_KEY
    ```
-   Open your browser to `http://localhost:3000` to access the editor.
 
-3. **Build for Production:**
+3. **Start the Development Servers (Vite + API together):**
+   ```bash
+   npm run dev
+   ```
+   Open your browser to `http://localhost:3000`. Vite (port 3000) proxies `/api` to the Express
+   server on port `3002`, so the AI assistant works in dev. (Use `npm run dev:web`
+   or `npm run dev:api` to run them individually.)
+
+4. **Build for Production:**
    ```bash
    npm run build
    ```
    This compiles and minifies the assets into the `dist/` directory.
+
+5. **Run the Production Server (serves `dist/` + the AI API):**
+   ```bash
+   npm start
+   ```
+   Express serves the built SPA and `/api/ai/chat` on `PORT` (default `3001`).
+
+---
+
+## Deployment (Docker → Google Cloud Run)
+
+The app ships as a **single container**: one Express process serves the static SPA
+and the AI proxy.
+
+```bash
+# Build the image
+docker build -t shapescript .
+
+# Run locally (provide the key at runtime)
+docker run -p 3001:3001 -e DEEPSEEK_API_KEY=sk-... shapescript
+
+# Deploy to Cloud Run (key from Secret Manager — never baked into the image)
+gcloud run deploy shapescript \
+  --source . \
+  --set-secrets DEEPSEEK_API_KEY=deepseek-key:latest \
+  --allow-unauthenticated
+```
+
+Cloud Run injects the `PORT` env var (typically `8080`); the server reads it
+automatically. `GET /health` is provided for startup/liveness probes.
 
 ---
 
